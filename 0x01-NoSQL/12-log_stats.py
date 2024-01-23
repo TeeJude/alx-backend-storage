@@ -2,6 +2,9 @@
 """
 Module that contains a python script that provides some stats about Nginx
 logs stored in MongoDB:
+Database: logs
+Collection: nginx
+method = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 """
 from pymongo import MongoClient
 
