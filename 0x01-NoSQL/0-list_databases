@@ -1,3 +1,3 @@
-// list all database present in a session
+// script that lists all database present in a session
 
 show dbs
