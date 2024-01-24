@@ -3,24 +3,32 @@
 Implementing an expiring web cache and tracker
 """
 import requests
-from functools import lru_cache
-from time import sleep
+import redis
+from functools import wraps
 
-@lru_cache(maxsize=128, typed=False)
+store = redis.Redis()
+
+def count_url_access(method):
+    """Counting how many times a URL is accessed"""
+    @wraps(method)
+    def wrapper(url):
+        cached_key = "cached:" + url
+        cached_data = store.get(cached_key)
+        if cached_data:
+            return cached_data.decode("utf-8")
+
+        count_key = "count:" + url
+        html = method(url)
+
+        store.incr(count_key)
+        store.set(cached_key, html)
+        store.expire(cached_key, 10)
+        return html
+    return wrapper
+
+
+@count_url_access
 def get_page(url: str) -> str:
-    count_key = f"count:{url}"
-    count = get_page.cache.get(count_key, 0)
-    count += 1
-    get_page.cache[count_key] = count
-    response = requests.get(url)
-    sleep(5)
-    get_page.cache[url] = response.text
-    get_page.cache.expire(url, 10)
-    return response.text
-
-get_page.cache = {}
-
-url_to_fetch = "http://slowwly.robertomurray.co.uk/delay/5000/url/text"
-html_content = get_page(url_to_fetch)
-print(html_content)
-print(f"The URL '{url_to_fetch}' was accessed {get_page.cache[f'count:{url_to_fetch}']} times.")
+    """Returns HTML content of a URL"""
+    res = requests.get(url)
+    return res.text
