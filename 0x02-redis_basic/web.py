@@ -30,7 +30,7 @@ def count_url_access(method):
 
 
 @count_url_access
-def get_page(https://google.com: str) -> str:
+def get_page(url: str) -> str:
     """Returns HTML content of a URL"""
     res = requests.get('https://google.com')
     return res.text
