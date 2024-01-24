@@ -8,7 +8,7 @@ import requests
 import redis
 from functools import wraps
 
-space = redis.Redis()
+store = redis.Redis()
 
 def count_url_access(method):
     """
@@ -24,9 +24,9 @@ def count_url_access(method):
         count_key = "count:" + url
         html = method(url)
 
-        space.incr(count_key)
-        space.set(cached_key, html)
-        space.expire(cached_key, 10)
+        store.incr(count_key)
+        store.set(cached_key, html)
+        store.expire(cached_key, 10)
         return html
     return wrapper
 
