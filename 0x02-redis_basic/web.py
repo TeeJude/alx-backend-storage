@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
-Module contains function to implement get_page. 
-Use request module to obtain HTML content of a URL and returns it
-and track the number of times a particular URL was accessed
+web cache and tracker
 """
 import requests
 import redis
@@ -10,10 +8,10 @@ from functools import wraps
 
 store = redis.Redis()
 
+
 def count_url_access(method):
-    """
-    Counting how many times a URL is accessed
-    """
+    """ Decorator counting how many times
+    a URL is accessed """
     @wraps(method)
     def wrapper(url):
         cached_key = "cached:" + url
@@ -33,8 +31,6 @@ def count_url_access(method):
 
 @count_url_access
 def get_page(url: str) -> str:
-    """
-    Returns HTML content of a URL
-    """
+    """ Returns HTML content of a url """
     res = requests.get(url)
     return res.text
